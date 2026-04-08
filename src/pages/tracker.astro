@@ -1,0 +1,106 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const items = await getCollection('tracker');
+const sorted = items.sort((a, b) => {
+  const severityOrder = { critical: 0, high: 1, medium: 2, low: 3, info: 4 };
+  const statusOrder = { open: 0, 'in-progress': 1, resolved: 2, 'wont-fix': 3 };
+  const statusDiff = statusOrder[a.data.status] - statusOrder[b.data.status];
+  if (statusDiff !== 0) return statusDiff;
+  return severityOrder[a.data.severity] - severityOrder[b.data.severity];
+});
+
+const open = sorted.filter(i => i.data.status === 'open' || i.data.status === 'in-progress');
+const resolved = sorted.filter(i => i.data.status === 'resolved' || i.data.status === 'wont-fix');
+
+const severityColors: Record<string, string> = {
+  critical: 'bg-red-900/50 text-red-400',
+  high: 'bg-orange-900/50 text-orange-400',
+  medium: 'bg-yellow-900/50 text-yellow-400',
+  low: 'bg-blue-900/50 text-blue-400',
+  info: 'bg-zinc-800 text-zinc-400',
+};
+
+const statusColors: Record<string, string> = {
+  open: 'bg-red-900/30 text-red-400',
+  'in-progress': 'bg-yellow-900/30 text-yellow-400',
+  resolved: 'bg-green-900/30 text-green-400',
+  'wont-fix': 'bg-zinc-800 text-zinc-500',
+};
+
+const categoryLabels: Record<string, string> = {
+  'owasp-top10': 'OWASP Top 10',
+  'known-vuln': 'Known Vuln',
+  'supply-chain': 'Supply Chain',
+  'novel-attack': 'Novel Attack',
+  'framework-advisory': 'Framework Advisory',
+  'patch-needed': 'Patch Needed',
+  'research-needed': 'Research Needed',
+};
+---
+
+<Base title="Security Tracker" description="Live tracking of cybersecurity vulnerabilities, advisories, and research items">
+  <h1 class="text-3xl font-bold text-zinc-100 mb-2">Security Tracker</h1>
+  <p class="text-zinc-500 mb-2">Live tracking of vulnerabilities, advisories, and research items. Updated by autonomous research loop.</p>
+  <p class="text-zinc-600 text-sm mb-8">Open items: {open.length} | Resolved: {resolved.length} | Total: {items.length}</p>
+
+  {open.length > 0 && (
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold text-zinc-200 mb-4">Open</h2>
+      <div class="space-y-3">
+        {open.map((item) => (
+          <div class="border border-zinc-800 rounded-lg p-4 hover:border-zinc-600 transition-colors">
+            <div class="flex items-center gap-2 mb-2 flex-wrap">
+              <span class={`text-xs font-mono px-2 py-0.5 rounded ${severityColors[item.data.severity]}`}>
+                {item.data.severity}
+              </span>
+              <span class={`text-xs font-mono px-2 py-0.5 rounded ${statusColors[item.data.status]}`}>
+                {item.data.status}
+              </span>
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">
+                {categoryLabels[item.data.category] || item.data.category}
+              </span>
+              {item.data.cve && (
+                <span class="text-xs font-mono text-cyan-400">{item.data.cve}</span>
+              )}
+              <span class="text-xs text-zinc-600 ml-auto">{item.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+            </div>
+            <h3 class="text-zinc-200 font-medium">{item.data.title}</h3>
+            {item.data.affects && (
+              <p class="text-zinc-500 text-sm mt-1">Affects: {item.data.affects}</p>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {resolved.length > 0 && (
+    <section>
+      <h2 class="text-xl font-semibold text-zinc-200 mb-4">Resolved</h2>
+      <div class="space-y-3 opacity-60">
+        {resolved.map((item) => (
+          <div class="border border-zinc-800 rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2 flex-wrap">
+              <span class={`text-xs font-mono px-2 py-0.5 rounded ${severityColors[item.data.severity]}`}>
+                {item.data.severity}
+              </span>
+              <span class={`text-xs font-mono px-2 py-0.5 rounded ${statusColors[item.data.status]}`}>
+                {item.data.status}
+              </span>
+              {item.data.cve && (
+                <span class="text-xs font-mono text-cyan-400">{item.data.cve}</span>
+              )}
+            </div>
+            <h3 class="text-zinc-200 font-medium line-through">{item.data.title}</h3>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {items.length === 0 && (
+    <p class="text-zinc-600 italic">Tracker initializing. First items incoming from research loop.</p>
+  )}
+</Base>

@@ -45,4 +45,19 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { research, 'vulnerability-classes': vulnerabilityClasses, insights, blog };
+const tracker = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/tracker' }),
+  schema: z.object({
+    title: z.string(),
+    category: z.enum(['owasp-top10', 'known-vuln', 'supply-chain', 'novel-attack', 'framework-advisory', 'patch-needed', 'research-needed']),
+    severity: z.enum(['critical', 'high', 'medium', 'low', 'info']),
+    status: z.enum(['open', 'in-progress', 'resolved', 'wont-fix']).default('open'),
+    date: z.coerce.date(),
+    updated: z.coerce.date().optional(),
+    cve: z.string().optional(),
+    source: z.string().optional(),
+    affects: z.string().optional(),
+  }),
+});
+
+export const collections = { research, 'vulnerability-classes': vulnerabilityClasses, insights, blog, tracker };
