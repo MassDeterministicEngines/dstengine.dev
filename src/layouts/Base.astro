@@ -1,0 +1,74 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Deterministic Security Testing — proving vulnerabilities exploitable' } = Astro.props;
+---
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title} | DST Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  </head>
+  <body class="bg-zinc-950 text-zinc-200 font-sans min-h-screen flex flex-col">
+    <nav class="border-b border-zinc-800 px-6 py-4">
+      <div class="max-w-4xl mx-auto flex items-center justify-between">
+        <a href="/" class="font-mono font-bold text-lg text-cyan-400 hover:text-cyan-300 transition-colors">
+          DST<span class="text-zinc-500">engine</span>
+        </a>
+        <div class="flex gap-6 text-sm font-medium">
+          <a href="/research" class="text-zinc-400 hover:text-zinc-200 transition-colors">Research</a>
+          <a href="/dst" class="text-zinc-400 hover:text-zinc-200 transition-colors">Tool</a>
+          <a href="/about" class="text-zinc-400 hover:text-zinc-200 transition-colors">About</a>
+          <a href="https://github.com/MassDeterministicEngines/dst-engine" class="text-zinc-400 hover:text-zinc-200 transition-colors" target="_blank">GitHub</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="flex-1 px-6 py-10">
+      <div class="max-w-4xl mx-auto">
+        <slot />
+      </div>
+    </main>
+
+    <footer class="border-t border-zinc-800 px-6 py-6 mt-auto">
+      <div class="max-w-4xl mx-auto text-center text-sm text-zinc-600">
+        <p>DST Engine &mdash; Open Source Deterministic Security Testing</p>
+        <p class="mt-1">Built by <a href="https://github.com/MassDeterministicEngines" class="text-zinc-500 hover:text-zinc-400">Nathaniel Prewett</a></p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+  .prose { max-width: 65ch; }
+  .prose h1 { font-size: 1.875rem; font-weight: 700; color: #e4e4e7; margin-bottom: 1rem; }
+  .prose h2 { font-size: 1.5rem; font-weight: 600; color: #e4e4e7; margin-top: 2.5rem; margin-bottom: 0.75rem; border-bottom: 1px solid #27272a; padding-bottom: 0.5rem; }
+  .prose h3 { font-size: 1.25rem; font-weight: 600; color: #d4d4d8; margin-top: 2rem; margin-bottom: 0.5rem; }
+  .prose p { color: #a1a1aa; line-height: 1.75; margin-bottom: 1rem; }
+  .prose a { color: #22d3ee; text-decoration: none; }
+  .prose a:hover { text-decoration: underline; }
+  .prose ul, .prose ol { color: #a1a1aa; margin-bottom: 1rem; padding-left: 1.5rem; }
+  .prose li { margin-bottom: 0.25rem; line-height: 1.75; }
+  .prose code { background: #1a1a2e; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; color: #22d3ee; }
+  .prose pre { background: #0f0f1a; border: 1px solid #27272a; border-radius: 0.5rem; padding: 1rem; overflow-x: auto; margin-bottom: 1.5rem; }
+  .prose pre code { background: none; padding: 0; color: #d4d4d8; }
+  .prose table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.875rem; }
+  .prose th { text-align: left; padding: 0.5rem; border-bottom: 2px solid #27272a; color: #e4e4e7; font-weight: 600; }
+  .prose td { padding: 0.5rem; border-bottom: 1px solid #1a1a2e; color: #a1a1aa; }
+  .prose blockquote { border-left: 3px solid #22d3ee; padding-left: 1rem; color: #71717a; font-style: italic; margin-bottom: 1rem; }
+  .prose strong { color: #e4e4e7; }
+  .prose hr { border: none; border-top: 1px solid #27272a; margin: 2rem 0; }
+</style>

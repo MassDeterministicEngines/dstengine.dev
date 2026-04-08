@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="About" description="About DST Engine and its creator">
+  <article class="prose">
+    <h1>About</h1>
+
+    <p>
+      DST (Deterministic Security Testing) is a phoneme-based static analysis engine that
+      <strong>proves vulnerabilities exploitable</strong>. It generates deterministic proof
+      certificates: the exact payload, delivery method, and verification oracle for each finding.
+    </p>
+
+    <h2>The Phoneme Architecture</h2>
+
+    <p>
+      The name "phoneme" comes from linguistics &mdash; the smallest unit of sound that
+      distinguishes meaning. In DST, a phoneme is the smallest unit of API behavior that
+      distinguishes security semantics. <code>mysql_query</code> and <code>pg_query</code>
+      sound different but mean the same thing: data goes to a database.
+    </p>
+
+    <p>
+      This decomposition makes DST language-neutral by <em>ideology</em>, not just architecture.
+      Adding a new language is ~200 lines of phoneme mappings. The graph and verifiers are shared.
+      The same insight extends naturally to AI security: <code>openai.chat.completions.create()</code>
+      is just another phoneme to classify.
+    </p>
+
+    <h2>The Numbers</h2>
+
+    <table>
+      <thead>
+        <tr><th>Benchmark</th><th>Result</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>OWASP BenchmarkJava (SQLi)</td><td><strong>92.7%</strong> (100% TPR, 7.3% FPR)</td></tr>
+        <tr><td>OWASP BenchmarkJava (all 2,740 files)</td><td><strong>83.7%</strong> composite</td></tr>
+        <tr><td>OWASP weakrand/crypto/hash/securecookie</td><td><strong>100/100</strong> (0% FPR)</td></tr>
+        <tr><td>NIST Juliet Java</td><td>100% (103/103 CWE categories)</td></tr>
+        <tr><td>Real-app false positive rate</td><td>2.1% (Apache Shiro)</td></tr>
+        <tr><td>CWE properties checked per file</td><td>783</td></tr>
+        <tr><td>Languages</td><td>10</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Who Built This</h2>
+
+    <p>
+      Built by Nathaniel Prewett in Lafayette, Indiana, collaborating with AI instances
+      across multiple sessions. The key insight was the phoneme architecture: decompose code
+      into universal semantic shapes, build a graph, let the graph be the detection engine.
+    </p>
+
+    <h2>Open Source</h2>
+
+    <p>
+      DST is open source under the MIT license.
+      <a href="https://github.com/MassDeterministicEngines/dst-engine">View on GitHub</a>.
+    </p>
+  </article>
+</Base>

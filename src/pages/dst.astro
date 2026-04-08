@@ -1,0 +1,67 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="DST Tool" description="DST — Deterministic Security Testing engine">
+  <article class="prose">
+    <h1>DST Engine</h1>
+
+    <h2>Quick Start</h2>
+
+    <pre><code>git clone https://github.com/MassDeterministicEngines/dst-engine.git
+cd dst-engine
+npm install --legacy-peer-deps
+npx tsx src/dst-cli.ts --demo --prove</code></pre>
+
+    <h2>What You'll See</h2>
+
+    <p>
+      DST parses source code into a graph, traces tainted data flows, verifies 783 CWE
+      properties, and generates proof certificates for exploitable findings:
+    </p>
+
+    <pre><code>[FAIL] CWE-89: SQL Injection
+  CRITICAL: User input from req.body.login flows to SQL query
+  at db.query(query, ...) without parameterization.
+    Source: req.body.login (line 10)
+    Sink:   db.query(query, ...) (line 11)
+    Missing: CONTROL (input validation or parameterized query)
+    PROOF [strong]:
+      Payload: ' UNION SELECT 'DST_CANARY_SQLI' --
+      Deliver: http POST /
+      Oracle:  hybrid — payload reaches sink unmodified</code></pre>
+
+    <p>
+      That <code>PROOF</code> block is the difference. DST doesn't just say
+      "this looks vulnerable" &mdash; it gives you the payload to prove it.
+    </p>
+
+    <h2>Architecture</h2>
+
+    <pre><code>Source code → tree-sitter AST
+  → Phoneme classification (API calls → universal semantic types)
+  → NeuralMap graph (nodes + tainted data flow edges)
+  → CWE verification (783 properties checked against graph)
+  → Proof generation (payload + delivery + oracle per finding)</code></pre>
+
+    <h2>Supported Languages</h2>
+
+    <p>
+      <strong>Benchmarked:</strong> Java, JavaScript/TypeScript<br />
+      <strong>Profiles built:</strong> Python, Go, Rust, PHP, C#, Ruby, Kotlin, Swift
+    </p>
+
+    <h2>AI Security Extensions</h2>
+
+    <p>
+      DST's phoneme architecture extends naturally to AI/LLM security. With ~190 lines
+      of mapper code (LLM SDK phonemes + a taint-transformer rule), DST can detect
+      67.9% of the AI security vulnerability landscape &mdash; including Text2SQL injection,
+      prompt injection (CWE-1427), and MCP server vulnerabilities.
+    </p>
+
+    <p>
+      <a href="/research">Read the research &rarr;</a>
+    </p>
+  </article>
+</Base>

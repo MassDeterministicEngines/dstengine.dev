@@ -1,0 +1,69 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const research = await getCollection('research');
+const latestPapers = research
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
+---
+
+<Base title="Home">
+  <div class="space-y-16">
+
+    <section class="py-8">
+      <p class="font-mono text-cyan-400 text-sm mb-4">deterministic security testing</p>
+      <h1 class="text-4xl font-bold text-zinc-100 leading-tight mb-6">
+        Static analysis that doesn't just find vulnerabilities &mdash; it <span class="text-cyan-400">proves</span> them exploitable.
+      </h1>
+      <p class="text-zinc-400 text-lg leading-relaxed max-w-2xl mb-8">
+        DST generates deterministic proof certificates: the exact payload, delivery method, and verification oracle for each finding. No AI in the detection loop. Same code, same report, every time.
+      </p>
+      <div class="flex gap-4">
+        <a href="https://github.com/MassDeterministicEngines/dst-engine" class="inline-block bg-cyan-500 text-zinc-950 font-semibold px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors text-sm" target="_blank">
+          View on GitHub
+        </a>
+        <a href="/research" class="inline-block border border-zinc-700 text-zinc-300 font-semibold px-5 py-2.5 rounded-lg hover:border-zinc-500 hover:text-zinc-100 transition-colors text-sm">
+          Read the Research
+        </a>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div class="border border-zinc-800 rounded-lg p-5">
+        <p class="font-mono text-cyan-400 text-2xl font-bold">783+</p>
+        <p class="text-zinc-500 text-sm mt-1">CWE properties checked per file</p>
+      </div>
+      <div class="border border-zinc-800 rounded-lg p-5">
+        <p class="font-mono text-cyan-400 text-2xl font-bold">10</p>
+        <p class="text-zinc-500 text-sm mt-1">Languages supported</p>
+      </div>
+      <div class="border border-zinc-800 rounded-lg p-5">
+        <p class="font-mono text-cyan-400 text-2xl font-bold">92.7%</p>
+        <p class="text-zinc-500 text-sm mt-1">OWASP Benchmark (SQLi)</p>
+      </div>
+    </section>
+
+    {latestPapers.length > 0 && (
+      <section>
+        <h2 class="text-xl font-semibold text-zinc-200 mb-6">Latest Research</h2>
+        <div class="space-y-4">
+          {latestPapers.map((paper) => (
+            <a href={`/research/${paper.id}`} class="block border border-zinc-800 rounded-lg p-5 hover:border-zinc-600 transition-colors">
+              <div class="flex items-center gap-3 mb-2">
+                <span class={`text-xs font-mono px-2 py-0.5 rounded ${paper.data.status === 'published' ? 'bg-cyan-900/50 text-cyan-400' : 'bg-zinc-800 text-zinc-500'}`}>
+                  {paper.data.status}
+                </span>
+                <span class="text-xs text-zinc-600">{paper.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+              </div>
+              <h3 class="text-zinc-200 font-medium">{paper.data.title}</h3>
+              <p class="text-zinc-500 text-sm mt-1 line-clamp-2">{paper.data.abstract}</p>
+            </a>
+          ))}
+        </div>
+        <a href="/research" class="inline-block mt-4 text-sm text-cyan-400 hover:text-cyan-300">All research &rarr;</a>
+      </section>
+    )}
+
+  </div>
+</Base>

@@ -1,0 +1,40 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const research = await getCollection('research');
+  return research.map((paper) => ({
+    params: { slug: paper.id },
+    props: { paper },
+  }));
+}
+
+const { paper } = Astro.props;
+const { Content } = await render(paper);
+---
+
+<Base title={paper.data.title} description={paper.data.abstract}>
+  <article class="prose">
+    <div class="mb-8">
+      <a href="/research" class="text-sm text-cyan-400 hover:text-cyan-300">&larr; All Research</a>
+    </div>
+
+    <div class="flex items-center gap-3 mb-4">
+      <span class={`text-xs font-mono px-2 py-0.5 rounded ${paper.data.status === 'published' ? 'bg-cyan-900/50 text-cyan-400' : 'bg-zinc-800 text-zinc-500'}`}>
+        {paper.data.status}
+      </span>
+      <span class="text-xs text-zinc-600">{paper.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+    </div>
+
+    <h1>{paper.data.title}</h1>
+
+    <div class="flex gap-2 mb-8">
+      {paper.data.tags.map((tag: string) => (
+        <span class="text-xs font-mono px-2 py-0.5 rounded bg-violet-900/30 text-violet-400">{tag}</span>
+      ))}
+    </div>
+
+    <Content />
+  </article>
+</Base>
