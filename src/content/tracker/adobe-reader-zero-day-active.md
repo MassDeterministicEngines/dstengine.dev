@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "Adobe Reader Zero-Day — Active Exploitation, No Patch"
 category: "patch-needed"
 severity: "critical"
 status: "open"
+zeroDay: true
+dstActionable: false
 date: 2026-03-26
 source: "https://cyberpress.org/sophisticated-zero-day-exploit/"
 affects: "Adobe Reader (all current versions)"

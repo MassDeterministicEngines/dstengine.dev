@@ -3,104 +3,248 @@ import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
 const items = await getCollection('tracker');
-const sorted = items.sort((a, b) => {
-  const severityOrder = { critical: 0, high: 1, medium: 2, low: 3, info: 4 };
-  const statusOrder = { open: 0, 'in-progress': 1, resolved: 2, 'wont-fix': 3 };
-  const statusDiff = statusOrder[a.data.status] - statusOrder[b.data.status];
-  if (statusDiff !== 0) return statusDiff;
-  return severityOrder[a.data.severity] - severityOrder[b.data.severity];
-});
 
-const open = sorted.filter(i => i.data.status === 'open' || i.data.status === 'in-progress');
-const resolved = sorted.filter(i => i.data.status === 'resolved' || i.data.status === 'wont-fix');
+const severityOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3, info: 4 };
+const byPriority = (a: any, b: any) => severityOrder[a.data.severity] - severityOrder[b.data.severity];
+
+// Domain splits
+const aiItems = items.filter(i => i.data.domain === 'ai').sort(byPriority);
+const codeItems = items.filter(i => i.data.domain === 'code').sort(byPriority);
+const dstItems = items.filter(i => i.data.dstActionable).sort(byPriority);
+
+// Zero-day sub-splits
+const aiZeroDays = aiItems.filter(i => i.data.zeroDay && i.data.status !== 'resolved');
+const aiOther = aiItems.filter(i => !i.data.zeroDay || i.data.status === 'resolved');
+const codeZeroDays = codeItems.filter(i => i.data.zeroDay && i.data.status !== 'resolved');
+const codeOther = codeItems.filter(i => !i.data.zeroDay || i.data.status === 'resolved');
+
+// Stats
+const totalOpen = items.filter(i => i.data.status === 'open' || i.data.status === 'in-progress').length;
+const totalResolved = items.filter(i => i.data.status === 'resolved').length;
+const totalCritical = items.filter(i => i.data.severity === 'critical' && i.data.status !== 'resolved').length;
+const totalZeroDays = items.filter(i => i.data.zeroDay && i.data.status !== 'resolved').length;
 
 const severityColors: Record<string, string> = {
-  critical: 'bg-red-900/50 text-red-400',
-  high: 'bg-orange-900/50 text-orange-400',
-  medium: 'bg-yellow-900/50 text-yellow-400',
-  low: 'bg-blue-900/50 text-blue-400',
-  info: 'bg-zinc-800 text-zinc-400',
+  critical: 'bg-red-900/50 text-red-400 border-red-800/50',
+  high: 'bg-orange-900/50 text-orange-400 border-orange-800/50',
+  medium: 'bg-yellow-900/50 text-yellow-400 border-yellow-800/50',
+  low: 'bg-blue-900/50 text-blue-400 border-blue-800/50',
+  info: 'bg-zinc-800/50 text-zinc-400 border-zinc-700/50',
 };
 
-const statusColors: Record<string, string> = {
-  open: 'bg-red-900/30 text-red-400',
-  'in-progress': 'bg-yellow-900/30 text-yellow-400',
-  resolved: 'bg-green-900/30 text-green-400',
-  'wont-fix': 'bg-zinc-800 text-zinc-500',
+const severityStripe: Record<string, string> = {
+  critical: 'border-l-red-500',
+  high: 'border-l-orange-500',
+  medium: 'border-l-yellow-500',
+  low: 'border-l-blue-500',
+  info: 'border-l-zinc-600',
 };
 
 const categoryLabels: Record<string, string> = {
-  'owasp-top10': 'OWASP Top 10',
+  'owasp-top10': 'OWASP',
   'known-vuln': 'Known Vuln',
   'supply-chain': 'Supply Chain',
   'novel-attack': 'Novel Attack',
-  'framework-advisory': 'Framework Advisory',
-  'patch-needed': 'Patch Needed',
-  'research-needed': 'Research Needed',
+  'framework-advisory': 'Framework',
+  'patch-needed': 'Needs Patch',
+  'research-needed': 'Research',
 };
 ---
 
-<Base title="Security Tracker" description="Live tracking of cybersecurity vulnerabilities, advisories, and research items">
-  <h1 class="text-3xl font-bold text-zinc-100 mb-2">Security Tracker</h1>
-  <p class="text-zinc-500 mb-2">Live tracking of vulnerabilities, advisories, and research items. Updated by autonomous research loop.</p>
-  <p class="text-zinc-600 text-sm mb-8">Open items: {open.length} | Resolved: {resolved.length} | Total: {items.length}</p>
+<Base title="Security Tracker" description="Live cybersecurity vulnerability tracker — AI issues, code vulnerabilities, and DST-actionable items">
 
-  {open.length > 0 && (
-    <section class="mb-12">
-      <h2 class="text-xl font-semibold text-zinc-200 mb-4">Open</h2>
-      <div class="space-y-3">
-        {open.map((item) => (
-          <div class="border border-zinc-800 rounded-lg p-4 hover:border-zinc-600 transition-colors">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-zinc-100 mb-2">Security Tracker</h1>
+    <p class="text-zinc-500 text-sm">Live vulnerability tracking. Updated by autonomous research. Open source.</p>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
+    <div class="border border-zinc-800 rounded-lg p-4 text-center">
+      <p class="font-mono text-2xl font-bold text-red-400">{totalCritical}</p>
+      <p class="text-zinc-500 text-xs mt-1">Critical Open</p>
+    </div>
+    <div class="border border-zinc-800 rounded-lg p-4 text-center">
+      <p class="font-mono text-2xl font-bold text-orange-400">{totalZeroDays}</p>
+      <p class="text-zinc-500 text-xs mt-1">Active Zero-Days</p>
+    </div>
+    <div class="border border-zinc-800 rounded-lg p-4 text-center">
+      <p class="font-mono text-2xl font-bold text-cyan-400">{totalOpen}</p>
+      <p class="text-zinc-500 text-xs mt-1">Open Items</p>
+    </div>
+    <div class="border border-zinc-800 rounded-lg p-4 text-center">
+      <p class="font-mono text-2xl font-bold text-green-400">{totalResolved}</p>
+      <p class="text-zinc-500 text-xs mt-1">Resolved</p>
+    </div>
+  </div>
+
+  <!-- Domain Tabs (JS-powered) -->
+  <div class="flex gap-1 mb-8 border-b border-zinc-800 pb-px" id="domain-tabs">
+    <button data-domain="ai" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-lg border border-zinc-800 border-b-0 bg-zinc-900 text-cyan-400">
+      AI Issues <span class="text-zinc-500 ml-1">({aiItems.length})</span>
+    </button>
+    <button data-domain="code" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-lg border border-zinc-800 border-b-0 text-zinc-400 hover:text-zinc-200">
+      Code Vulns <span class="text-zinc-500 ml-1">({codeItems.length})</span>
+    </button>
+    <button data-domain="dst" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-lg border border-zinc-800 border-b-0 text-zinc-400 hover:text-zinc-200">
+      DST Actionable <span class="text-zinc-500 ml-1">({dstItems.length})</span>
+    </button>
+  </div>
+
+  <!-- AI Domain -->
+  <div id="domain-ai" class="domain-panel">
+    {aiZeroDays.length > 0 && (
+      <div class="mb-8">
+        <h3 class="text-sm font-mono text-red-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+          Active Zero-Days
+        </h3>
+        <div class="grid gap-3">
+          {aiZeroDays.map((item) => (
+            <div class={`border-l-4 ${severityStripe[item.data.severity]} border border-zinc-800 rounded-r-lg p-4 hover:border-zinc-600 transition-colors bg-zinc-900/50`}>
+              <div class="flex items-center gap-2 mb-2 flex-wrap">
+                <span class={`text-xs font-mono px-2 py-0.5 rounded ${severityColors[item.data.severity]}`}>{item.data.severity}</span>
+                <span class="text-xs font-mono px-1.5 py-0.5 rounded bg-red-900/30 text-red-400">0-day</span>
+                {item.data.cve && <span class="text-xs font-mono text-cyan-400">{item.data.cve}</span>}
+                <span class="text-xs text-zinc-600 ml-auto">{item.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+              </div>
+              <h3 class="text-zinc-200 font-medium">{item.data.title}</h3>
+              {item.data.affects && <p class="text-zinc-500 text-sm mt-1">{item.data.affects}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <div class="grid gap-3">
+      {aiOther.filter(i => i.data.status !== 'resolved').map((item) => (
+        <div class={`border-l-4 ${severityStripe[item.data.severity]} border border-zinc-800 rounded-r-lg p-4 hover:border-zinc-600 transition-colors`}>
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class={`text-xs font-mono px-2 py-0.5 rounded ${severityColors[item.data.severity]}`}>{item.data.severity}</span>
+            <span class="text-xs font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400">{categoryLabels[item.data.category]}</span>
+            {item.data.cve && <span class="text-xs font-mono text-cyan-400">{item.data.cve}</span>}
+            <span class="text-xs text-zinc-600 ml-auto">{item.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+          </div>
+          <h3 class="text-zinc-200 font-medium">{item.data.title}</h3>
+          {item.data.affects && <p class="text-zinc-500 text-sm mt-1">{item.data.affects}</p>}
+        </div>
+      ))}
+    </div>
+
+    {aiItems.length === 0 && <p class="text-zinc-600 italic">No AI-driven issues tracked yet.</p>}
+  </div>
+
+  <!-- Code Domain -->
+  <div id="domain-code" class="domain-panel hidden">
+    {codeZeroDays.length > 0 && (
+      <div class="mb-8">
+        <h3 class="text-sm font-mono text-red-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+          Active Zero-Days
+        </h3>
+        <div class="grid gap-3">
+          {codeZeroDays.map((item) => (
+            <div class={`border-l-4 ${severityStripe[item.data.severity]} border border-zinc-800 rounded-r-lg p-4 hover:border-zinc-600 transition-colors bg-zinc-900/50`}>
+              <div class="flex items-center gap-2 mb-2 flex-wrap">
+                <span class={`text-xs font-mono px-2 py-0.5 rounded ${severityColors[item.data.severity]}`}>{item.data.severity}</span>
+                <span class="text-xs font-mono px-1.5 py-0.5 rounded bg-red-900/30 text-red-400">0-day</span>
+                {item.data.cve && <span class="text-xs font-mono text-cyan-400">{item.data.cve}</span>}
+                <span class="text-xs text-zinc-600 ml-auto">{item.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+              </div>
+              <h3 class="text-zinc-200 font-medium">{item.data.title}</h3>
+              {item.data.affects && <p class="text-zinc-500 text-sm mt-1">{item.data.affects}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <div class="grid gap-3">
+      {codeOther.filter(i => i.data.status !== 'resolved').map((item) => (
+        <div class={`border-l-4 ${severityStripe[item.data.severity]} border border-zinc-800 rounded-r-lg p-4 hover:border-zinc-600 transition-colors`}>
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class={`text-xs font-mono px-2 py-0.5 rounded ${severityColors[item.data.severity]}`}>{item.data.severity}</span>
+            <span class="text-xs font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400">{categoryLabels[item.data.category]}</span>
+            {item.data.cve && <span class="text-xs font-mono text-cyan-400">{item.data.cve}</span>}
+            <span class="text-xs text-zinc-600 ml-auto">{item.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+          </div>
+          <h3 class="text-zinc-200 font-medium">{item.data.title}</h3>
+          {item.data.affects && <p class="text-zinc-500 text-sm mt-1">{item.data.affects}</p>}
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- DST Actionable Domain -->
+  <div id="domain-dst" class="domain-panel hidden">
+    <div class="border border-cyan-900/30 bg-cyan-950/20 rounded-lg p-4 mb-6">
+      <p class="text-cyan-400 text-sm font-medium mb-1">About DST Actionable Items</p>
+      <p class="text-zinc-400 text-sm">These are vulnerabilities where we've cloned the pattern, built an intricate test case, and verified that a shelled (forked) DST instance can detect it without regressing on existing benchmarks. Items here represent <strong class="text-zinc-200">proven additions</strong> to DST's detection capability.</p>
+      <p class="text-zinc-500 text-xs mt-2">It's up to the creator (Nathaniel Prewett) to review, verify, and integrate these into the main DST engine — and he actively does. DST's goal is 100% of everything known, generalized.</p>
+    </div>
+
+    {dstItems.length > 0 ? (
+      <div class="grid gap-3">
+        {dstItems.map((item) => (
+          <div class={`border-l-4 border-l-cyan-500 border border-zinc-800 rounded-r-lg p-4 hover:border-zinc-600 transition-colors`}>
             <div class="flex items-center gap-2 mb-2 flex-wrap">
-              <span class={`text-xs font-mono px-2 py-0.5 rounded ${severityColors[item.data.severity]}`}>
-                {item.data.severity}
-              </span>
-              <span class={`text-xs font-mono px-2 py-0.5 rounded ${statusColors[item.data.status]}`}>
-                {item.data.status}
-              </span>
-              <span class="text-xs font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">
-                {categoryLabels[item.data.category] || item.data.category}
-              </span>
-              {item.data.cve && (
-                <span class="text-xs font-mono text-cyan-400">{item.data.cve}</span>
-              )}
-              <span class="text-xs text-zinc-600 ml-auto">{item.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+              <span class={`text-xs font-mono px-2 py-0.5 rounded ${severityColors[item.data.severity]}`}>{item.data.severity}</span>
+              <span class="text-xs font-mono px-1.5 py-0.5 rounded bg-cyan-900/30 text-cyan-400">DST verified</span>
+              {item.data.cve && <span class="text-xs font-mono text-cyan-400">{item.data.cve}</span>}
+              {item.data.dstShellTest && <span class="text-xs font-mono text-zinc-500">test: {item.data.dstShellTest}</span>}
             </div>
             <h3 class="text-zinc-200 font-medium">{item.data.title}</h3>
-            {item.data.affects && (
-              <p class="text-zinc-500 text-sm mt-1">Affects: {item.data.affects}</p>
-            )}
+            {item.data.affects && <p class="text-zinc-500 text-sm mt-1">{item.data.affects}</p>}
           </div>
         ))}
       </div>
-    </section>
-  )}
+    ) : (
+      <p class="text-zinc-600 italic">No items have been verified as DST-actionable yet. Items move here after being cloned, tested in a shelled DST fork, and confirmed to detect without regression.</p>
+    )}
+  </div>
 
-  {resolved.length > 0 && (
-    <section>
-      <h2 class="text-xl font-semibold text-zinc-200 mb-4">Resolved</h2>
-      <div class="space-y-3 opacity-60">
-        {resolved.map((item) => (
-          <div class="border border-zinc-800 rounded-lg p-4">
-            <div class="flex items-center gap-2 mb-2 flex-wrap">
-              <span class={`text-xs font-mono px-2 py-0.5 rounded ${severityColors[item.data.severity]}`}>
-                {item.data.severity}
-              </span>
-              <span class={`text-xs font-mono px-2 py-0.5 rounded ${statusColors[item.data.status]}`}>
-                {item.data.status}
-              </span>
-              {item.data.cve && (
-                <span class="text-xs font-mono text-cyan-400">{item.data.cve}</span>
-              )}
+  <!-- Resolved (collapsed) -->
+  {items.filter(i => i.data.status === 'resolved').length > 0 && (
+    <details class="mt-10">
+      <summary class="text-zinc-500 text-sm cursor-pointer hover:text-zinc-300 transition-colors">
+        Show resolved items ({items.filter(i => i.data.status === 'resolved').length})
+      </summary>
+      <div class="mt-3 space-y-2 opacity-50">
+        {items.filter(i => i.data.status === 'resolved').map((item) => (
+          <div class="border border-zinc-800/50 rounded-lg p-3">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-green-900/30 text-green-400">resolved</span>
+              {item.data.cve && <span class="text-xs font-mono text-zinc-500">{item.data.cve}</span>}
             </div>
-            <h3 class="text-zinc-200 font-medium line-through">{item.data.title}</h3>
+            <h3 class="text-zinc-400 text-sm line-through mt-1">{item.data.title}</h3>
           </div>
         ))}
       </div>
-    </section>
+    </details>
   )}
 
-  {items.length === 0 && (
-    <p class="text-zinc-600 italic">Tracker initializing. First items incoming from research loop.</p>
-  )}
 </Base>
+
+<script>
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.domain-panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const domain = tab.getAttribute('data-domain');
+
+      // Update tab styles
+      tabs.forEach(t => {
+        t.classList.remove('bg-zinc-900', 'text-cyan-400');
+        t.classList.add('text-zinc-400');
+      });
+      tab.classList.add('bg-zinc-900', 'text-cyan-400');
+      tab.classList.remove('text-zinc-400');
+
+      // Show/hide panels
+      panels.forEach(p => p.classList.add('hidden'));
+      document.getElementById(`domain-${domain}`)?.classList.remove('hidden');
+    });
+  });
+</script>

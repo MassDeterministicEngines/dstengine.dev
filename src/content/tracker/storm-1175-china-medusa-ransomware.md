@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "Storm-1175 (China) Deploying Medusa Ransomware via Zero-Days"
 category: "novel-attack"
 severity: "critical"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-04-07
 source: "https://thehackernews.com/2026/04/china-linked-storm-1175-exploits-zero.html"
 affects: "Healthcare, education, professional services, finance — US, UK, Australia"

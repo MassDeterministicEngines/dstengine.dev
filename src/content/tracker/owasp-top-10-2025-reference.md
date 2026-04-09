@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "OWASP Top 10 2025 — Updated Web Application Security Risks"
 category: "owasp-top10"
 severity: "info"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-01-01
 source: "https://owasp.org/Top10/2025/en/"
 affects: "All web applications"

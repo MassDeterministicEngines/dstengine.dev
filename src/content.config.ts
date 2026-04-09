@@ -49,9 +49,13 @@ const tracker = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/tracker' }),
   schema: z.object({
     title: z.string(),
+    domain: z.enum(['ai', 'code']),
     category: z.enum(['owasp-top10', 'known-vuln', 'supply-chain', 'novel-attack', 'framework-advisory', 'patch-needed', 'research-needed']),
     severity: z.enum(['critical', 'high', 'medium', 'low', 'info']),
     status: z.enum(['open', 'in-progress', 'resolved', 'wont-fix']).default('open'),
+    zeroDay: z.boolean().default(false),
+    dstActionable: z.boolean().default(false),
+    dstShellTest: z.string().optional(),
     date: z.coerce.date(),
     updated: z.coerce.date().optional(),
     cve: z.string().optional(),

@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "36 Malicious npm Packages Exploiting Redis/PostgreSQL"
 category: "supply-chain"
 severity: "high"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-04-07
 source: "https://thehackernews.com/2026/04/36-malicious-npm-packages-exploited.html"
 affects: "npm ecosystem — Redis and PostgreSQL users"

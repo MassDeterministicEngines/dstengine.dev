@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "TrueConf Zero-Day Exploited by Chinese APT (TrueChaos)"
 category: "known-vuln"
 severity: "high"
 status: "open"
+zeroDay: true
+dstActionable: false
 date: 2026-04-02
 cve: "CVE-2026-3502"
 source: "https://thehackernews.com/2026/03/trueconf-zero-day-exploited-in-attacks.html"

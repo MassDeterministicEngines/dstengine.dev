@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "Microsoft Patch Tuesday — April 14, 2026 (Upcoming)"
 category: "patch-needed"
 severity: "info"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-04-14
 source: "https://patchmypc.com/events/patch-tuesday-support-group-april-2026/"
 affects: "Windows, Office, Server products"

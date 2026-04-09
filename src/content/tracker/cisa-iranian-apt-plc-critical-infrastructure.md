@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "CISA Alert: Iranian APT Targeting US Critical Infrastructure PLCs"
 category: "novel-attack"
 severity: "critical"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-04-07
 source: "https://www.cisa.gov/news-events/cybersecurity-advisories/aa26-097a"
 affects: "Rockwell Automation/Allen-Bradley PLCs — Water, Energy, Government sectors"

@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "Iran-Nexus M365 Password Spraying — 300+ Israeli Organizations"
 category: "novel-attack"
 severity: "high"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-04-07
 source: "https://blog.checkpoint.com/research/iran-nexus-password-spray-campaign-targeting-cloud-environments-with-a-focus-on-the-middle-east/"
 affects: "Israeli government, municipalities, energy, transport, tech (300+), UAE (25+)"

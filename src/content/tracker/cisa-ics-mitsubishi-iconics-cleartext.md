@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "CISA ICS Advisory: Mitsubishi/ICONICS SQL Credentials in Cleartext"
 category: "framework-advisory"
 severity: "medium"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-04-07
 cve: "CVE-2025-14815"
 source: "https://www.cisa.gov/news-events/ics-advisories/icsa-26-097-01"

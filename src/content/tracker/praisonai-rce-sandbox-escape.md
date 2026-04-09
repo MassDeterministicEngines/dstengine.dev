@@ -1,8 +1,11 @@
 ---
+domain: "ai"
 title: "PraisonAI Critical RCE + Sandbox Escape (Two CVEs)"
 category: "framework-advisory"
 severity: "critical"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-04-08
 cve: "CVE-2026-39890"
 source: "https://www.thehackerwire.com/vulnerability/CVE-2026-39890/"

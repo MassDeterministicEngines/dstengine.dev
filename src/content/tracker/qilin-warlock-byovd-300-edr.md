@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "Qilin + Warlock Ransomware — BYOVD Killing 300+ EDR Products"
 category: "novel-attack"
 severity: "critical"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-04-06
 source: "https://thehackernews.com/2026/04/qilin-and-warlock-ransomware-use.html"
 affects: "Nearly every EDR vendor — 300+ products targeted"

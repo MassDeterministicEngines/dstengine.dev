@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "Nix Daemon Privilege Escalation to Root via Symlink Following"
 category: "known-vuln"
 severity: "critical"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-04-08
 cve: "CVE-2026-39860"
 source: "https://discourse.nixos.org/t/nix-security-advisory-privilege-escalation-via-symlink-following-during-fod-output-registration/76900"

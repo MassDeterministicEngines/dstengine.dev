@@ -1,8 +1,11 @@
 ---
+domain: "ai"
 title: "vLLM Critical RCE via Video URL Processing"
 category: "framework-advisory"
 severity: "critical"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-03-15
 cve: "CVE-2026-22778"
 source: "https://www.ox.security/blog/cve-2026-22778-vllm-rce-vulnerability/"

@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "Windows 'BlueHammer' Zero-Day LPE — Exploit Code Public, No Patch"
 category: "patch-needed"
 severity: "high"
 status: "open"
+zeroDay: true
+dstActionable: false
 date: 2026-04-03
 source: "https://www.bleepingcomputer.com/news/security/disgruntled-researcher-leaks-bluehammer-windows-zero-day-exploit/"
 affects: "Windows (multiple versions, unpatched)"

@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "Axios npm Supply Chain Compromise — North Korea (UNC1069)"
 category: "supply-chain"
 severity: "critical"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-03-31
 source: "https://cloud.google.com/blog/topics/threat-intelligence/north-korea-threat-actor-targets-axios-npm-package"
 affects: "Axios npm package (100M+ weekly downloads)"

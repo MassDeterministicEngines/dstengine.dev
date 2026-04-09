@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "ChipSoft Healthcare Ransomware — 80% of Dutch Hospitals Affected"
 category: "novel-attack"
 severity: "critical"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-04-07
 source: "https://www.theregister.com/2026/04/08/chipsoft_ransomware/"
 affects: "ChipSoft patient record software (~80% of Dutch hospitals)"

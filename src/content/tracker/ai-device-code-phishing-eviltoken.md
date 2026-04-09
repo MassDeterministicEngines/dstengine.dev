@@ -1,8 +1,11 @@
 ---
+domain: "code"
 title: "AI-Enabled Device Code Phishing (EvilToken PhaaS) — 10-15 Campaigns Daily"
 category: "novel-attack"
 severity: "high"
 status: "open"
+zeroDay: false
+dstActionable: false
 date: 2026-04-07
 source: "https://www.microsoft.com/en-us/security/blog/2026/04/06/ai-enabled-device-code-phishing-campaign-april-2026/"
 affects: "Microsoft 365 organizations — US, Canada, Australia, NZ, Germany"
