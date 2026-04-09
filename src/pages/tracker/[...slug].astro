@@ -1,0 +1,81 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const items = await getCollection('tracker');
+  return items.map((item) => ({
+    params: { slug: item.id },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const { Content } = await render(item);
+
+const severityColors: Record<string, string> = {
+  critical: 'bg-red-900/50 text-red-400',
+  high: 'bg-orange-900/50 text-orange-400',
+  medium: 'bg-yellow-900/50 text-yellow-400',
+  low: 'bg-blue-900/50 text-blue-400',
+  info: 'bg-zinc-800 text-zinc-400',
+};
+
+const domainLabels: Record<string, string> = { ai: 'AI Issue', code: 'Code Vulnerability' };
+---
+
+<Base title={item.data.title} description={item.data.title}>
+  <article class="prose">
+    <div class="mb-6">
+      <a href="/tracker" class="text-sm text-cyan-400 hover:text-cyan-300">&larr; Back to Tracker</a>
+    </div>
+
+    <div class="flex items-center gap-2 mb-4 flex-wrap">
+      <span class={`text-xs font-mono px-2 py-0.5 rounded ${severityColors[item.data.severity]}`}>
+        {item.data.severity}
+      </span>
+      <span class="text-xs font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">
+        {domainLabels[item.data.domain] || item.data.domain}
+      </span>
+      {item.data.zeroDay && (
+        <span class="text-xs font-mono px-2 py-0.5 rounded bg-red-900/30 text-red-400">zero-day</span>
+      )}
+      {item.data.dstActionable && (
+        <span class="text-xs font-mono px-2 py-0.5 rounded bg-cyan-900/30 text-cyan-400">DST verified</span>
+      )}
+    </div>
+
+    <h1>{item.data.title}</h1>
+
+    <table>
+      <tbody>
+        {item.data.cve && (
+          <tr><td><strong>CVE</strong></td><td><code>{item.data.cve}</code></td></tr>
+        )}
+        <tr><td><strong>Severity</strong></td><td>{item.data.severity}</td></tr>
+        <tr><td><strong>Status</strong></td><td>{item.data.status}</td></tr>
+        <tr><td><strong>Date</strong></td><td>{item.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</td></tr>
+        {item.data.affects && (
+          <tr><td><strong>Affects</strong></td><td>{item.data.affects}</td></tr>
+        )}
+        {item.data.source && (
+          <tr><td><strong>Source</strong></td><td><a href={item.data.source} target="_blank" rel="noopener">{new URL(item.data.source).hostname}</a></td></tr>
+        )}
+        {item.data.dstShellTest && (
+          <tr><td><strong>Shell Test</strong></td><td><code>{item.data.dstShellTest}</code></td></tr>
+        )}
+      </tbody>
+    </table>
+
+    <h2>Details</h2>
+    <Content />
+
+    {item.data.source && (
+      <div class="mt-8">
+        <a href={item.data.source} target="_blank" rel="noopener" class="inline-block bg-zinc-800 text-zinc-200 font-medium px-4 py-2 rounded-lg hover:bg-zinc-700 transition-colors text-sm">
+          Read full advisory &rarr;
+        </a>
+      </div>
+    )}
+  </article>
+</Base>
